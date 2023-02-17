@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <vector>
+#include <cmath>
+#include <queue>
+#include <set>
+#include <map>
+#include <stack>
+using namespace std;
+
+#define For(i,n) for(int i=0; i<(n); i++)
+#define mp(a,b) make_pair((a),(b))
+typedef long long ll;
+typedef pair<int,int> pii;
+
+int n,m,a;
+vector<vector<int> > G;
+vector<bool> A,T;
+int cas=0;
+vector<int> I,L;
+vector<pii> Res;
+
+int dfs(int v, int otec) {
+    T[v]=true;
+    I[v]=L[v]=cas++;
+    int poc=0;
+    if(A[v]) poc++;
+    For(i,G[v].size()) {
+        int w=G[v][i];
+        if(w==otec) continue;
+        if(T[w]) {L[v]=min(L[v],I[w]); continue;}
+        poc+=dfs(w,v);
+        L[v]=min(L[v],L[w]);
+    }
+    if(v!=0 && L[v]==I[v] && (poc==0 || poc==a)) {
+        Res.push_back(mp(min(v,otec),max(v,otec)));
+    }
+    return poc;
+}
+
+int main() {
+    scanf("%d %d %d",&n,&m,&a);
+    A.resize(n,false);
+    For(i,a) {
+        int x;
+        scanf("%d",&x);
+        A[x-1]=true;
+    }
+    G.resize(n);
+    For(i,m) {
+        int x,y;
+        scanf("%d %d",&x,&y);
+        x--; y--;
+        G[x].push_back(y);
+        G[y].push_back(x);
+    }
+    T.resize(n,false);
+    I.resize(n);
+    L.resize(n);
+    dfs(0,-1);
+    sort(Res.begin(),Res.end());
+    printf("%d\n",Res.size());
+    For(i,Res.size()) printf("%d %d\n",Res[i].first+1,Res[i].second+1);
+}
